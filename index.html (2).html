@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Should I Sell? Decision Scorecard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #1A4744;
+    --teal-dark: #0E2624;
+    --gold: #C4964A;
+    --cream: #FAF7F1;
+    --ink: #2B2B2B;
+    --grey: #8A8A8A;
+    --line: #E4E0D6;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --cream: #FAF7F1; }
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .progress-wrap {
+    width: 100%;
+    height: 6px;
+    background: var(--line);
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width .35s ease;
+  }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px 0;
+    font-size: 13px;
+    letter-spacing: .08em;
+    color: var(--grey);
+    text-transform: uppercase;
+  }
+  .brand-row b { color: var(--teal); }
+  .stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    width: 100%;
+    max-width: 560px;
+    text-align: center;
+    animation: rise .45s ease both;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .kicker {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 40px);
+    color: var(--teal);
+    margin: 0 0 10px;
+    line-height: 1.15;
+  }
+  .sub {
+    color: var(--grey);
+    font-size: 16px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+  }
+  .opt {
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color .15s, background .15s, transform .1s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .opt:hover { border-color: var(--gold); background: #FEFBF6; }
+  .opt:active { transform: scale(.99); }
+  .opt .letter {
+    width: 28px; height: 28px; border-radius: 8px;
+    border: 1.5px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--grey);
+    flex-shrink: 0;
+  }
+  .opt.selected { border-color: var(--teal); background: #EFF4F3; }
+  .opt.selected .letter { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+  }
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 13px 28px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--teal); color: #fff; }
+  .btn-primary:disabled { opacity: .35; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--grey); padding: 13px 10px; }
+  .hint { font-size: 13px; color: var(--grey); margin-top: 16px; }
+
+  input[type=text], input[type=email] {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    background: #fff;
+    color: var(--ink);
+  }
+  input:focus { outline: none; border-color: var(--teal); }
+
+  .result-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    font-size: 22px;
+    margin-bottom: 18px;
+  }
+  .result-ready   { background: #E6EFEE; color: var(--teal); }
+  .result-more    { background: #F7EFE1; color: var(--gold); }
+  .result-stay    { background: #EFEFEF; color: #6b6b6b; }
+
+  .cta-btn {
+    display: inline-block;
+    background: var(--gold);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 16px 32px;
+    border-radius: 999px;
+    margin-top: 10px;
+    font-size: 16px;
+  }
+  .secondary-link {
+    display: block;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--grey);
+    text-decoration: underline;
+    cursor: pointer;
+    background: none; border: none; font-family: inherit;
+  }
+  .footer-mark {
+    text-align: center;
+    padding: 18px;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+<div class="brand-row">
+  <span>Should I Sell? <b>Decision Scorecard</b></span>
+  <span id="stepLabel">Intro</span>
+</div>
+
+<div class="stage"><div class="card" id="card"></div></div>
+<div class="footer-mark">Keys. Clarity. Katina. &nbsp;&bull;&nbsp; Clarity Before Commitment.</div>
+
+<script>
+const QUESTIONS = [
+  {
+    key: "reason",
+    kicker: "Reason for Moving",
+    q: "What's actually driving this, right now?",
+    opts: [
+      { t: "A clear, specific reason \u2014 job, family, financial change", v: 3 },
+      { t: "Something's shifted, but I haven't nailed down why", v: 2 },
+      { t: "Just curious \u2014 no real reason yet", v: 1 },
+    ]
+  },
+  {
+    key: "timing",
+    kicker: "Timing",
+    q: "If you decided to sell, how soon would you want to move?",
+    opts: [
+      { t: "Within the next 3 months", v: 3 },
+      { t: "Sometime in the next 6\u201312 months", v: 2 },
+      { t: "No real timeline \u2014 just exploring", v: 1 },
+    ]
+  },
+  {
+    key: "financial",
+    kicker: "Financial Readiness",
+    q: "How prepared do you feel for the cash you'd need at move-in?",
+    opts: [
+      { t: "Fully prepared \u2014 I know my numbers", v: 3 },
+      { t: "Mostly, with a few gaps", v: 2 },
+      { t: "Not prepared at all", v: 1 },
+    ]
+  },
+  {
+    key: "proceeds",
+    kicker: "Estimated Net Proceeds",
+    q: "Have you estimated what you'd actually walk away with \u2014 not just your home's value?",
+    opts: [
+      { t: "Yes, I have a solid estimate", v: 3 },
+      { t: "I have a rough idea", v: 2 },
+      { t: "Honestly, no idea", v: 1 },
+    ]
+  },
+  {
+    key: "nexthome",
+    kicker: "Next-Home Plan",
+    q: "Do you know where you'd live next?",
+    opts: [
+      { t: "Yes \u2014 it's mapped out", v: 3 },
+      { t: "Some ideas, nothing final", v: 2 },
+      { t: "No idea yet", v: 1 },
+    ]
+  },
+  {
+    key: "market",
+    kicker: "Market Considerations",
+    q: "How well do you know what's happening in your specific market right now?",
+    opts: [
+      { t: "Pretty well informed", v: 3 },
+      { t: "General sense only", v: 2 },
+      { t: "Not really", v: 1 },
+    ]
+  },
+  {
+    key: "concerns",
+    kicker: "Unresolved Concerns",
+    q: "Do you have unanswered questions still holding you back?",
+    opts: [
+      { t: "No major concerns left", v: 3 },
+      { t: "A couple of things I'd like answered", v: 2 },
+      { t: "Quite a few unresolved questions", v: 1 },
+    ]
+  },
+];
+
+const TOTAL_STAGES = QUESTIONS.length + 2; // intro + questions + contact (result is final reveal, not counted in bar)
+let stage = 0; // 0 = intro, 1..7 = questions, 8 = contact, 9 = result
+let answers = {};
+let contact = { name: "", email: "" };
+
+const card = document.getElementById("card");
+const bar = document.getElementById("progressBar");
+const stepLabel = document.getElementById("stepLabel");
+
+function setProgress(pct, label) {
+  bar.style.width = pct + "%";
+  stepLabel.textContent = label;
+}
+
+function render() {
+  if (stage === 0) return renderIntro();
+  if (stage >= 1 && stage <= QUESTIONS.length) return renderQuestion(stage - 1);
+  if (stage === QUESTIONS.length + 1) return renderContact();
+  return renderResult();
+}
+
+function renderIntro() {
+  setProgress(0, "Intro");
+  card.innerHTML = `
+    <div class="kicker">7 Questions &bull; About 2 Minutes</div>
+    <h1>Should I Sell? Decision Scorecard</h1>
+    <p class="sub">Answer honestly \u2014 there's no score to chase. This just helps you (and me) see where you actually stand before any conversation about listing.</p>
+    <div class="nav-row" style="justify-content:center;">
+      <button class="btn btn-primary" onclick="goNext()">Start \u2192</button>
+    </div>
+  `;
+}
+
+function renderQuestion(i) {
+  const q = QUESTIONS[i];
+  setProgress(((i + 1) / (QUESTIONS.length + 1)) * 100, `${i + 1} of ${QUESTIONS.length}`);
+  const selected = answers[q.key];
+  card.innerHTML = `
+    <div class="kicker">${q.kicker}</div>
+    <h1>${q.q}</h1>
+    <div class="options" id="opts">
+      ${q.opts.map((o, idx) => `
+        <button class="opt ${selected === o.v ? 'selected' : ''}" data-v="${o.v}" onclick="selectOpt('${q.key}', ${o.v}, this)">
+          <span class="letter">${String.fromCharCode(65+idx)}</span>
+          <span>${o.t}</span>
+        </button>
+      `).join("")}
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goBack()">\u2190 Back</button>
+      <button class="btn btn-primary" id="nextBtn" ${selected === undefined ? "disabled" : ""} onclick="goNext()">Next \u2192</button>
+    </div>
+  `;
+}
+
+function selectOpt(key, val, el) {
+  answers[key] = val;
+  document.querySelectorAll('#opts .opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function renderContact() {
+  setProgress(100, "Almost done");
+  card.innerHTML = `
+    <div class="kicker">Last Step</div>
+    <h1>Where should your results go?</h1>
+    <p class="sub">So you have this to reference \u2014 and so I know to follow up with context, not a cold pitch.</p>
+    <input type="text" id="nameInput" placeholder="First name" value="${contact.name}">
+    <input type="email" id="emailInput" placeholder="Email address" value="${contact.email}">
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goBack()">\u2190 Back</button>
+      <button class="btn btn-primary" onclick="submitContact()">See My Results \u2192</button>
+    </div>
+  `;
+}
+
+const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbwHK6CyU9hTCQ-aXhajs99VPekksBuBa7baBlfgJDDsCNLe9492kiFLnQyWT4CxRY0/exec";
+const SHEET_TOKEN = "kn_2026-scorecard"; // must match the SECRET value in your Apps Script
+
+async function submitContact() {
+  const name = document.getElementById("nameInput").value.trim();
+  const email = document.getElementById("emailInput").value.trim();
+  if (!email) { document.getElementById("emailInput").style.borderColor = "#c0392b"; return; }
+  contact = { name, email };
+
+  const btn = document.querySelector('.btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = "Sending\u2026"; }
+
+  const r = scoreResult();
+  const total = Object.values(answers).reduce((a,b) => a+b, 0);
+  const payload = {
+    token: SHEET_TOKEN,
+    name, email,
+    result: r.label,
+    score: `${total}/21`,
+  };
+  QUESTIONS.forEach(q => {
+    payload[q.kicker] = q.opts.find(o => o.v === answers[q.key])?.t || "";
+  });
+
+  try {
+    // Apps Script web apps don't support CORS reads from the browser, so we fire-and-forget
+    // with no-cors. The submission still goes through; we just can't read a response back.
+    await fetch(SHEET_ENDPOINT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" }, // avoids a CORS preflight that Apps Script rejects
+      body: JSON.stringify(payload),
+    });
+  } catch (e) {
+    console.error("Submission failed:", e);
+  }
+
+  stage++;
+  render();
+}
+
+function scoreResult() {
+  const total = Object.values(answers).reduce((a,b) => a+b, 0);
+  if (total >= 17) return {
+    key: "ready", cls: "result-ready", label: "Ready to Explore Selling",
+    msg: "Your reason is clear, the numbers are close to in hand, and what's left is property-specific \u2014 which is exactly what a real conversation can answer."
+  };
+  if (total >= 12) return {
+    key: "more", cls: "result-more", label: "Need More Information",
+    msg: "The direction feels right, but a few numbers \u2014 proceeds, next-home cost, or timing \u2014 are still estimates. Worth firming those up before deciding anything."
+  };
+  return {
+    key: "stay", cls: "result-stay", label: "Staying Put May Make Sense Right Now",
+    msg: "Nothing here says you shouldn't sell someday \u2014 it says today might not be the moment, or an alternative is worth a closer look first."
+  };
+}
+
+function renderResult() {
+  bar.style.width = "100%";
+  stepLabel.textContent = "Results";
+  const r = scoreResult();
+  const total = Object.values(answers).reduce((a,b) => a+b, 0);
+  card.innerHTML = `
+    <div class="kicker">Hi ${contact.name || "there"} \u2014 here's where you stand</div>
+    <div class="result-badge ${r.cls}">${r.label}</div>
+    <p class="sub" style="margin-bottom:26px;">${r.msg}</p>
+    <a class="cta-btn" href="https://calendly.com/katinabodden" target="_blank" rel="noopener">Book a Seller Decision Conversation</a>
+    <button class="secondary-link" onclick="downloadResults('${r.label}', ${total})">Save these results</button>
+  `;
+}
+
+async function downloadResults(label, total) {
+  const lines = [
+    "Should I Sell? \u2014 Decision Scorecard Results",
+    `Name: ${contact.name || "\u2014"}`,
+    `Email: ${contact.email}`,
+    "",
+    `Result: ${label} (score ${total}/21)`,
+    "",
+    "Your answers:",
+    ...QUESTIONS.map(q => `\u2022 ${q.kicker}: ${q.opts.find(o => o.v === answers[q.key])?.t || "\u2014"}`),
+    "",
+    "Keys. Clarity. Katina. \u2014 Clarity Before Commitment.",
+  ].join("\n");
+  const blob = new Blob([lines], {type: "text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "should-i-sell-results.txt"; a.click();
+}
+
+function goNext() { stage++; render(); }
+function goBack() { if (stage > 0) { stage--; render(); } }
+
+render();
+</script>
+</body>
+</html>
