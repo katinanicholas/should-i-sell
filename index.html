@@ -51,15 +51,26 @@
   }
   .brand-row {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
+    gap: 12px;
     padding: 18px 28px 0;
     font-size: 13px;
-    letter-spacing: .08em;
+    letter-spacing: .06em;
     color: var(--grey);
     text-transform: uppercase;
   }
   .brand-row b { color: var(--teal); }
+  .brand-row span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .brand-row span:last-child { flex-shrink: 0; }
+  @media (max-width: 420px) {
+    .brand-row { font-size: 11px; padding: 16px 20px 0; }
+  }
   .stage {
     flex: 1;
     display: flex;
@@ -371,7 +382,8 @@ function renderContact() {
   `;
 }
 
-const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbxGQacaAiS93NVJJsxQHcDKBOM_MZhPNylrh4xcTBY7CQE-DSs_BuD9CGjfxZz9Hat_DA/exec"; // must match the SECRET value in your Apps Script
+const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbxGQacaAiS93NVJJsxQHcDKBOM_MZhPNylrh4xcTBY7CQE-DSs_BuD9CGjfxZz9Hat_DA/exec";
+const SHEET_TOKEN = "kn_2026-scorecard"; // must match the SECRET value in your Apps Script
 
 async function submitContact() {
   const name = document.getElementById("nameInput").value.trim();
